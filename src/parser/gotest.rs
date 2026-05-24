@@ -12,7 +12,7 @@ use std::time::Duration;
 use serde::Deserialize;
 
 use crate::domain::{Framework, TestId, TestResult, TestStatus};
-use crate::error::{FlaketideError, Result};
+use crate::error::Result;
 use crate::parser::TestParser;
 use crate::util::json::{jsonl_lines, truncate_chars};
 

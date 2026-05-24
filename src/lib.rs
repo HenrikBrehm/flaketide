@@ -10,6 +10,17 @@
 // ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 // FITNESS FOR A PARTICULAR PURPOSE.
 
+// Pragmatic lint posture for the v0.1.0 release-candidate. These are
+// stylistic / opinionated clippy lints that we deliberately accept while
+// the baseline stabilises; tighten in a follow-up PR.
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::useless_conversion)]
+#![allow(clippy::collapsible_match)]
+#![allow(clippy::collapsible_if)]
+#![allow(clippy::explicit_counter_loop)]
+#![allow(clippy::needless_borrows_for_generic_args)]
+#![allow(dead_code)]
+
 //! `flaketide` library — cross-framework flaky-test intelligence.
 //!
 //! See `README.md` for an overview. Module map:

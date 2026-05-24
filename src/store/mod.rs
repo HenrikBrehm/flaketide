@@ -6,7 +6,6 @@ use std::time::Duration;
 
 use chrono::{DateTime, Utc};
 use rusqlite::Connection;
-use rusqlite_migration::{Migrations, M};
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
