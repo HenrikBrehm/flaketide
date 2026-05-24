@@ -1,0 +1,17 @@
+# GitHub-discoverable CODEOWNERS file.
+# Every PR is automatically requested for review from the owners listed here.
+#
+# Syntax: <pattern>  <@user1> <@user2> ...
+
+# Default owner for everything in the repo.
+*                       @HenrikBrehm
+
+# Security-sensitive areas require explicit attention.
+/src/ai/                @HenrikBrehm
+/src/report/github.rs   @HenrikBrehm
+/src/store/             @HenrikBrehm
+/src/util/net.rs        @HenrikBrehm
+/src/util/sanitize.rs   @HenrikBrehm
+/SECURITY.md            @HenrikBrehm
+/deny.toml              @HenrikBrehm
+/migrations/            @HenrikBrehm

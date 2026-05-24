@@ -32,6 +32,7 @@ impl Store {
             }
         }
         let path = path.to_path_buf();
+        let path_for_perm = path.clone();
         let conn = tokio::task::spawn_blocking(move || -> Result<Connection> {
             let mut conn = Connection::open(&path)?;
             conn.pragma_update(None, "journal_mode", "WAL")?;
@@ -41,7 +42,25 @@ impl Store {
         })
         .await
         .map_err(|e| FlaketideError::Storage(format!("spawn_blocking: {e}")))??;
+        // (M5) Tighten file mode on Unix — the history may contain test log
+        // excerpts including secrets. No-op on Windows where ACLs already
+        // restrict to the creating user by default.
+        Self::restrict_db_permissions(&path_for_perm);
         Ok(Self { inner: Arc::new(Mutex::new(conn)) })
+    }
+
+    #[cfg(unix)]
+    fn restrict_db_permissions(path: &Path) {
+        use std::os::unix::fs::PermissionsExt;
+        if let Err(e) = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600)) {
+            tracing::warn!(path = %path.display(), error = %e, "could not chmod 0600 on history db");
+        }
+    }
+
+    #[cfg(not(unix))]
+    fn restrict_db_permissions(_path: &Path) {
+        // Windows: NTFS ACLs inherit from parent; the .flaketide directory
+        // created with create_dir_all already restricts to the user.
     }
 
     /// Open an in-memory database (tests only).

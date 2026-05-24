@@ -150,7 +150,12 @@ impl App {
             v.recent_messages
                 .iter()
                 .take(5)
-                .map(|m| format!("  • {}", m.lines().next().unwrap_or("")))
+                .map(|m| {
+                    // (L1) Strip terminal control sequences before TUI render.
+                    let line = m.lines().next().unwrap_or("");
+                    let safe = crate::util::sanitize::sanitize_terminal_text(line);
+                    format!("  • {}", safe)
+                })
                 .collect::<Vec<_>>()
                 .join("\n"),
         );

@@ -61,10 +61,14 @@ impl AnthropicClient {
         let status = resp.status();
         let body = resp.text().await?;
         if !status.is_success() {
-            return Err(FlaketideError::Ai(format!("anthropic {}: {}", status, body)));
+            // Truncate body — error responses may reflect the prompt (which
+            // contains test log excerpts that could hold secrets) back to us.
+            let snippet: String = body.chars().take(200).collect();
+            return Err(FlaketideError::Ai(format!("anthropic {status}: {snippet}")));
         }
+        // Body intentionally omitted — `serde_json` error already pinpoints location.
         let parsed: Response = serde_json::from_str(&body)
-            .map_err(|e| FlaketideError::Ai(format!("decode response: {e}; body: {body}")))?;
+            .map_err(|e| FlaketideError::Ai(format!("decode response: {e}")))?;
         let text = parsed.content.iter()
             .filter(|b| b.kind == "text")
             .map(|b| b.text.as_str())

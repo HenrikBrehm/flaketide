@@ -52,6 +52,8 @@ shell-words = "1"
 which = "6"
 blake3 = "1"
 async-trait = "0.1"
+tempfile = "3"
+url = "2"
 
 [dev-dependencies]
 assert_cmd = "2"
@@ -59,7 +61,6 @@ predicates = "3"
 insta = { version = "1.40", features = ["json", "yaml"] }
 proptest = "1"
 mockito = "1.5"
-tempfile = "3"
 
 [profile.release]
 opt-level = 3

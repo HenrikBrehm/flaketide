@@ -28,11 +28,24 @@ pub async fn run(args: InitArgs, config: Option<&Path>) -> Result<i32> {
         .unwrap_or(cwd);
 
     let toml_path = root.join("flaketide.toml");
-    if toml_path.exists() && !args.force {
-        return Err(FlaketideError::Config(format!(
-            "{} already exists; pass --force to overwrite",
-            toml_path.display()
-        )));
+    // (M4) Eliminate the TOCTOU race between "exists?" and "write".
+    // Without --force, use create_new(true) which atomically fails if the
+    // file (or a symlink that resolves to one) already exists.
+    if !args.force {
+        match std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&toml_path)
+        {
+            Ok(_handle) => { /* sentinel created — fs::write below rewrites content */ }
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                return Err(FlaketideError::Config(format!(
+                    "{} already exists; pass --force to overwrite",
+                    toml_path.display()
+                )));
+            }
+            Err(e) => return Err(FlaketideError::Io(e)),
+        }
     }
 
     let framework: Option<Framework> = args.framework.map(Into::into).or_else(|| detect_framework(&root));

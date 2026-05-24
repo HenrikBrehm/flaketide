@@ -94,10 +94,17 @@ pub struct Classifier {
     client: anthropic::AnthropicClient,
 }
 
+const ANTHROPIC_CANONICAL_URL: &str = "https://api.anthropic.com";
+
 impl Classifier {
     pub fn from_env(cfg: AiConfig) -> Result<Self> {
         let key = std::env::var("ANTHROPIC_API_KEY").map_err(|_| FlaketideError::AiDisabled)?;
-        let base = cfg.base_url.clone().unwrap_or_else(|| "https://api.anthropic.com".to_string());
+        let base = cfg
+            .base_url
+            .clone()
+            .unwrap_or_else(|| ANTHROPIC_CANONICAL_URL.to_string());
+        // SSRF guard: refuse to send ANTHROPIC_API_KEY to an arbitrary host.
+        crate::util::net::validate_base_url(&base, "ai", ANTHROPIC_CANONICAL_URL)?;
         let client = anthropic::AnthropicClient::new(&key, &base)?;
         Ok(Self { cfg, client })
     }
@@ -141,7 +148,11 @@ fn parse_verdict(raw: &str) -> Result<Verdict> {
             }
         }
     }
-    Err(FlaketideError::Ai(format!("classifier response was not valid JSON: {raw}")))
+    // (L2) Truncate raw — it can include prompt content reflected by the model.
+    let snippet: String = raw.chars().take(120).collect();
+    Err(FlaketideError::Ai(format!(
+        "classifier response was not valid JSON: {snippet}"
+    )))
 }
 
 #[cfg(test)]

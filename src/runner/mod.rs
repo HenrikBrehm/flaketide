@@ -76,7 +76,14 @@ impl RepeatRunner {
 
 async fn run_once(run_id: u32, total: u32, options: &RunOptions) -> Result<TestRun> {
     let started_at = Utc::now();
-    tracing::info!(run = run_id + 1, of = total, command = ?options.command, "starting run");
+    // Log only the program name — argv may contain secrets (e.g.
+    // `cargo test -- --env API_KEY=...`). The full command is recorded
+    // in the SQLite history, but not in tracing output.
+    let program_name = options.command.first().map(|s| s.as_str()).unwrap_or("?");
+    tracing::info!(
+        run = run_id + 1, of = total, program = program_name,
+        "starting run"
+    );
 
     let (program, args) = options.command.split_first()
         .ok_or_else(|| FlaketideError::Runner("empty command".into()))?;
@@ -90,13 +97,18 @@ async fn run_once(run_id: u32, total: u32, options: &RunOptions) -> Result<TestR
     cmd.stdin(Stdio::null());
     cmd.kill_on_drop(true);
 
-    let temp_dir = if options.isolated {
-        let dir = std::env::temp_dir().join(format!("flaketide-{}-{}", std::process::id(), run_id));
-        std::fs::create_dir_all(&dir).ok();
-        cmd.env("TMPDIR", &dir);
-        cmd.env("TEMP", &dir);
-        cmd.env("TMP", &dir);
-        Some(dir)
+    // Use tempfile for an unpredictable, O_EXCL-created directory; the
+    // previous `std::env::temp_dir().join(format!("flaketide-{pid}-{id}"))`
+    // path was predictable and TOCTOU-attackable for `--isolated` runs.
+    let temp_guard = if options.isolated {
+        let td = tempfile::Builder::new()
+            .prefix("flaketide-")
+            .tempdir()
+            .map_err(|e| FlaketideError::Runner(format!("tempdir: {e}")))?;
+        cmd.env("TMPDIR", td.path());
+        cmd.env("TEMP", td.path());
+        cmd.env("TMP", td.path());
+        Some(td)
     } else { None };
 
     let mut child = cmd.spawn().map_err(|e| FlaketideError::Runner(format!("spawn: {e}")))?;
@@ -108,16 +120,24 @@ async fn run_once(run_id: u32, total: u32, options: &RunOptions) -> Result<TestR
     let stdout_task = tokio::spawn(capture::collect_stream(stdout, tee, false));
     let stderr_task = tokio::spawn(capture::collect_stream(stderr, tee, true));
 
-    let exit_status = match options.timeout {
-        Some(t) => {
-            match tokio::time::timeout(t, child.wait()).await {
-                Ok(r) => r.map_err(|e| FlaketideError::Runner(format!("wait: {e}")))?,
-                Err(_) => {
-                    let _ = child.kill().await;
-                    return Err(FlaketideError::Timeout(t));
-                }
+    // Default safety net: even when the user hasn't set an explicit timeout,
+    // a 30-minute cap prevents a hanging test command from blocking all runs
+    // indefinitely (which would burn unlimited CI minutes). Set the config's
+    // `timeout = "0s"` to opt out and accept unbounded waits.
+    const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30 * 60);
+    let effective_timeout = match options.timeout {
+        Some(t) if t.as_secs() == 0 => None,
+        Some(t) => Some(t),
+        None => Some(DEFAULT_TIMEOUT),
+    };
+    let exit_status = match effective_timeout {
+        Some(t) => match tokio::time::timeout(t, child.wait()).await {
+            Ok(r) => r.map_err(|e| FlaketideError::Runner(format!("wait: {e}")))?,
+            Err(_) => {
+                let _ = child.kill().await;
+                return Err(FlaketideError::Timeout(t));
             }
-        }
+        },
         None => child.wait().await.map_err(|e| FlaketideError::Runner(format!("wait: {e}")))?,
     };
 
@@ -127,9 +147,8 @@ async fn run_once(run_id: u32, total: u32, options: &RunOptions) -> Result<TestR
         .map_err(|e| FlaketideError::Runner(format!("stderr task: {e}")))??;
     let finished_at = Utc::now();
 
-    if let Some(dir) = temp_dir {
-        let _ = std::fs::remove_dir_all(dir);
-    }
+    // Drop the TempDir guard explicitly so cleanup runs in the same scope.
+    drop(temp_guard);
 
     let framework = options.framework
         .or_else(|| detect(&stdout_bytes))

@@ -32,6 +32,8 @@ pub async fn sync_issue(
     })?;
 
     let base = cfg.base_url.as_deref().unwrap_or(DEFAULT_BASE);
+    // SSRF guard: refuse to send GITHUB_TOKEN to an arbitrary host.
+    crate::util::net::validate_base_url(base, "github", DEFAULT_BASE)?;
     let title = cfg.issue_title.clone();
     let body = build_body(verdicts, quarantine);
     let labels = cfg.issue_labels.clone();
@@ -120,8 +122,14 @@ fn build_body(verdicts: &[FlakeReport], quarantine: &[QuarantineEntry]) -> Strin
 }
 
 fn detect_repo_from_git() -> Option<String> {
+    // (L3) Constrain `git` to the discovered repo root so we don't accidentally
+    // resolve the origin of a *parent* repository (e.g. when flaketide runs
+    // from a worktree that itself isn't a checkout of the user's repo).
+    let cwd = std::env::current_dir().ok()?;
+    let repo_root = crate::util::paths::find_repo_root(&cwd).unwrap_or(cwd);
     let out = std::process::Command::new("git")
         .args(["remote", "get-url", "origin"])
+        .current_dir(&repo_root)
         .output()
         .ok()?;
     if !out.status.success() { return None; }
