@@ -130,16 +130,25 @@ fn detect_repo_from_git() -> Option<String> {
 }
 
 fn parse_owner_name(url: &str) -> Option<String> {
-    let stripped = url
-        .trim_end_matches(".git")
-        .trim_end_matches('/');
+    // Iteratively peel trailing `/` and `.git` until both are absent.
+    // (Single-pass trim misses `foo.git/` because trim_end_matches(".git")
+    //  doesn't strip when the suffix is hidden behind a trailing slash.)
+    let mut s = url.to_string();
+    loop {
+        let next = s.trim_end_matches('/').trim_end_matches(".git").to_string();
+        if next.len() == s.len() {
+            break;
+        }
+        s = next;
+    }
+    let stripped = s.as_str();
     if let Some(rest) = stripped.strip_prefix("git@github.com:") {
         return Some(rest.to_string());
     }
-    if let Some(rest) = stripped.strip_prefix("https://github.com/") {
+    if let Some(rest) = stripped.strip_prefix("ssh://git@github.com/") {
         return Some(rest.to_string());
     }
-    if let Some(rest) = stripped.strip_prefix("ssh://git@github.com/") {
+    if let Some(rest) = stripped.strip_prefix("https://github.com/") {
         return Some(rest.to_string());
     }
     None

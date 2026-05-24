@@ -116,10 +116,14 @@ mod tests {
 
     #[test]
     fn severity_drops_with_age() {
-        let p = flake_posterior(5, 10);
+        // Use 100 runs so the 95% credible interval is narrow enough that
+        // confidence > 0 under the default 0.3 hdi_width_max threshold.
+        // (At n=10 the interval is ~0.5 wide, which zeroes out confidence.)
+        let p = flake_posterior(30, 100);
         let s_fresh = severity(&p, 0.0, 0.3);
         let s_old = severity(&p, 60.0, 0.3);
-        assert!(s_fresh > s_old);
+        assert!(s_fresh > 0.0, "fresh severity should be > 0, got {s_fresh}");
+        assert!(s_fresh > s_old, "fresh ({s_fresh}) should exceed old ({s_old})");
     }
 
     #[test]

@@ -54,6 +54,17 @@ pub struct RemoveArgs {
 }
 
 pub async fn run(cmd: QuarantineCmd, config: Option<&Path>, json: bool) -> Result<i32> {
+    // `Emit` is pure — it just prints a snippet — so we skip the DB entirely.
+    // Opening the store eagerly would cause SQLite-lock races when several
+    // `quarantine emit` commands run in parallel (e.g. in a test suite).
+    if let QuarantineCmd::Emit(a) = &cmd {
+        let fw: Framework = a.framework.into();
+        let id = TestId::from_raw(a.test_id.clone())?;
+        let snippet = crate::quarantine::emit::emit_skip(fw, &id, "flaketide-quarantined");
+        println!("{snippet}");
+        return Ok(0);
+    }
+
     let cwd = std::env::current_dir()?;
     let (cfg, _) = load_config(config, &cwd)?;
     let root = find_repo_root(&cwd).unwrap_or(cwd);
@@ -98,13 +109,7 @@ pub async fn run(cmd: QuarantineCmd, config: Option<&Path>, json: bool) -> Resul
             }
             Ok(0)
         }
-        QuarantineCmd::Emit(a) => {
-            let fw: Framework = a.framework.into();
-            let id = TestId::from_raw(a.test_id)?;
-            let snippet = crate::quarantine::emit::emit_skip(fw, &id, "flaketide-quarantined");
-            println!("{snippet}");
-            Ok(0)
-        }
+        QuarantineCmd::Emit(_) => unreachable!("handled above before opening the DB"),
         QuarantineCmd::Remove(a) => {
             let id = TestId::from_raw(a.test_id)?;
             let removed = store.remove_quarantine(&id).await?;

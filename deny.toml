@@ -25,9 +25,6 @@ allow = [
     "CC0-1.0",
     "OpenSSL",
 ]
-exceptions = [
-    { allow = ["AGPL-3.0-or-later"], name = "flaketide" },
-]
 confidence-threshold = 0.8
 
 [bans]
