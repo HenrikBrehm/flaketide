@@ -1,0 +1,27 @@
+﻿# flaketide configuration - copy to flaketide.toml at your repo root.
+# All keys are optional; values shown are defaults.
+
+# framework = "cargo"
+# command = "cargo test --no-fail-fast"
+runs = 10
+parallel = 1
+# timeout = "10m"
+db_path = ".flaketide/history.db"
+
+[thresholds]
+flake_prob_min = 0.05
+hdi_width_max = 0.30
+severity_alert = 0.50
+
+[quarantine]
+max_age_days = 30
+max_count = 25
+
+[ai]
+model = "claude-opus-4-7"
+max_log_excerpt_chars = 12000
+
+[github]
+# repo = "owner/name"
+issue_title = "Flaky tests - flaketide report"
+issue_labels = ["flaky-test", "automated"]
