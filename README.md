@@ -1,5 +1,23 @@
 # flaketide
 
+> ⚠️ **WORK IN PROGRESS — NOT YET FINISHED** ⚠️
+>
+> This project is **under active construction**. The v0.1.0 source tree is in place
+> and the core test pipeline (Linux/macOS/Windows) is green on CI, but several
+> pieces are still being built or polished:
+>
+> - `cargo fmt` baseline not yet established (style cleanup pending)
+> - `clippy -D warnings` not yet clean (lint cleanup pending)
+> - Real-API end-to-end runs against Anthropic / GitHub not yet exercised
+> - TUI screens are minimal viable (full ratatui polish + snapshot tests pending)
+> - No published release on crates.io or GitHub Releases yet
+> - Real-world test-fixture corpus (per framework, per version) not yet committed
+> - Windows subprocess tree-kill is best-effort (Job-Object backend pending)
+>
+> **Do not use this in production yet.** Stars and feedback welcome; install
+> instructions in the rest of this README work today on Ubuntu/macOS/Windows
+> via `cargo install --git`, but the v0.1.0 tag has not been cut.
+
 > Cross-framework flaky-test intelligence — detect, classify, and eliminate flakes from any test suite.
 
 `flaketide` is a single-binary Rust CLI that runs your test command N times, computes a Bayesian flake probability per test, persists history in a local SQLite database, and (optionally) uses the Claude API to classify root causes. It speaks every major framework's output format — Jest, Vitest, pytest, `go test`, `cargo test`, nextest, generic JUnit XML — under one unified data model.
