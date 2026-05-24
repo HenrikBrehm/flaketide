@@ -146,7 +146,8 @@ fn man_cmd(out_dir: &std::path::Path) -> Result<i32> {
     // Sub-commands
     for sub in cmd.get_subcommands() {
         let name = format!("flaketide-{}", sub.get_name());
-        let sub_cmd = sub.clone().name(name.clone());
+        let leaked: &'static str = Box::leak(name.clone().into_boxed_str());
+        let sub_cmd = sub.clone().name(leaked);
         let man = clap_mangen::Man::new(sub_cmd);
         let mut buf = Vec::new();
         man.render(&mut buf).map_err(|e| crate::FlaketideError::Other(e.into()))?;

@@ -17,7 +17,7 @@ use tokio::sync::Semaphore;
 
 use crate::domain::{Framework, TestRun};
 use crate::error::{FlaketideError, Result};
-use crate::parser::{detect, parser_for};
+use crate::parser::{detect::detect, parser_for};
 
 pub mod capture;
 pub mod process;

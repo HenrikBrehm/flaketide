@@ -92,8 +92,9 @@ pub fn parse_junit(raw: &[u8], framework: Framework) -> Result<Vec<TestResult>> 
             }
             Event::End(e) => {
                 let tag = std::str::from_utf8(e.name().as_ref())
-                    .map_err(|err| FlaketideError::Xml(err.to_string()))?;
-                match tag {
+                    .map_err(|err| FlaketideError::Xml(err.to_string()))?
+                    .to_string();
+                match tag.as_str() {
                     "testsuite" => { suite_stack.pop(); }
                     "testcase" => {
                         if let Some(cur) = current.take() {
