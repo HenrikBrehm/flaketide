@@ -23,7 +23,11 @@ pub fn validate_base_url(url: &str, name: &str, canonical: &str) -> Result<()> {
         FlaketideError::Config(format!("{name}.base_url is not a valid URL ({e}): {url}"))
     })?;
     let host = parsed.host_str().unwrap_or("");
-    let host_lower = host.to_ascii_lowercase();
+    // Strip surrounding [] that some URL crates retain for IPv6 hosts (e.g. "[::1]").
+    let host_lower = host
+        .trim_start_matches('[')
+        .trim_end_matches(']')
+        .to_ascii_lowercase();
     let is_loopback = host_lower == "localhost"
         || host_lower == "127.0.0.1"
         || host_lower == "::1"
