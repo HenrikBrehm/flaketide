@@ -1,4 +1,4 @@
-﻿//! `flaketide ci` — CI-friendly pipeline: run + summarize + emit JUnit/JSON + exit non-zero on regressions.
+//! `flaketide ci` — CI-friendly pipeline: run + summarize + emit JUnit/JSON + exit non-zero on regressions.
 
 use std::path::{Path, PathBuf};
 

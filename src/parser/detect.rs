@@ -1,4 +1,4 @@
-﻿//! Auto-detect the test framework from raw output bytes.
+//! Auto-detect the test framework from raw output bytes.
 
 use crate::domain::Framework;
 

@@ -1,4 +1,4 @@
-﻿//! Migration definitions for the SQLite history database.
+//! Migration definitions for the SQLite history database.
 use rusqlite_migration::{Migrations, M};
 
 pub fn migrations() -> Migrations<'static> {

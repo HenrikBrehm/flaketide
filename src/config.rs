@@ -1,4 +1,4 @@
-﻿//! Configuration loader: merges flaketide.toml + env vars + CLI overrides.
+//! Configuration loader: merges flaketide.toml + env vars + CLI overrides.
 
 use std::path::{Path, PathBuf};
 

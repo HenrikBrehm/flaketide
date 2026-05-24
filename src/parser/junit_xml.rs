@@ -1,4 +1,4 @@
-﻿//! Generic JUnit XML parser. Works with Maven Surefire, Gradle, pytest --junit-xml,
+//! Generic JUnit XML parser. Works with Maven Surefire, Gradle, pytest --junit-xml,
 //! JUnit5 console launcher, and basically every JUnit-emitting tool.
 
 use std::time::Duration;
@@ -33,55 +33,19 @@ pub fn parse_junit(raw: &[u8], framework: Framework) -> Result<Vec<TestResult>> 
         let ev = reader.read_event_into(&mut buf).map_err(|e| FlaketideError::Xml(e.to_string()))?;
         match ev {
             Event::Eof => break,
-            Event::Start(e) | Event::Empty(e) => {
-                let is_empty = matches!(reader.read_event_into(&mut Vec::new()), Ok(Event::End(_)));
-                let _ = is_empty;
+            Event::Start(e) => {
                 let tag = std::str::from_utf8(e.name().as_ref())
                     .map_err(|err| FlaketideError::Xml(err.to_string()))?
                     .to_string();
-                match tag.as_str() {
-                    "testsuite" => {
-                        let name = read_attr(&e, b"name").unwrap_or_default();
-                        suite_stack.push(name);
-                    }
-                    "testcase" => {
-                        let name = read_attr(&e, b"name").unwrap_or_default();
-                        let classname = read_attr(&e, b"classname").unwrap_or_default();
-                        let time = read_attr(&e, b"time").and_then(|t| t.parse::<f64>().ok()).unwrap_or(0.0);
-                        let suite_path = if !classname.is_empty() {
-                            classname
-                        } else {
-                            suite_stack.last().cloned().unwrap_or_default()
-                        };
-                        current = Some(TestCaseBuilder {
-                            suite: suite_path,
-                            name,
-                            time,
-                            status: TestStatus::Passed,
-                            message: None,
-                            log: None,
-                        });
-                        current_text.clear();
-                    }
-                    "failure" | "error" | "skipped" => {
-                        if let Some(cur) = current.as_mut() {
-                            let msg = read_attr(&e, b"message").or_else(|| read_attr(&e, b"type"));
-                            cur.status = match tag.as_str() {
-                                "failure" => TestStatus::Failed,
-                                "error" => TestStatus::Errored,
-                                "skipped" => TestStatus::Skipped,
-                                _ => cur.status,
-                            };
-                            if let Some(m) = msg {
-                                cur.message.get_or_insert(m);
-                            }
-                        }
-                    }
-                    "system-out" | "system-err" => {
-                        current_text.clear();
-                    }
-                    _ => {}
-                }
+                handle_open_tag(&tag, &e, false, framework, &mut suite_stack,
+                                &mut current, &mut current_text, &mut out)?;
+            }
+            Event::Empty(e) => {
+                let tag = std::str::from_utf8(e.name().as_ref())
+                    .map_err(|err| FlaketideError::Xml(err.to_string()))?
+                    .to_string();
+                handle_open_tag(&tag, &e, true, framework, &mut suite_stack,
+                                &mut current, &mut current_text, &mut out)?;
             }
             Event::Text(t) => {
                 let s = t.unescape().map_err(|e| FlaketideError::Xml(e.to_string()))?.to_string();
@@ -156,6 +120,82 @@ fn read_attr(e: &quick_xml::events::BytesStart, key: &[u8]) -> Option<String> {
         }
     }
     None
+}
+
+#[allow(clippy::too_many_arguments)]
+fn handle_open_tag(
+    tag: &str,
+    e: &quick_xml::events::BytesStart,
+    is_empty: bool,
+    framework: Framework,
+    suite_stack: &mut Vec<String>,
+    current: &mut Option<TestCaseBuilder>,
+    current_text: &mut String,
+    out: &mut Vec<TestResult>,
+) -> Result<()> {
+    match tag {
+        "testsuite" => {
+            let name = read_attr(e, b"name").unwrap_or_default();
+            suite_stack.push(name);
+            if is_empty {
+                suite_stack.pop();
+            }
+        }
+        "testcase" => {
+            let name = read_attr(e, b"name").unwrap_or_default();
+            let classname = read_attr(e, b"classname").unwrap_or_default();
+            let time = read_attr(e, b"time")
+                .and_then(|t| t.parse::<f64>().ok())
+                .unwrap_or(0.0);
+            let suite_path = if !classname.is_empty() {
+                classname
+            } else {
+                suite_stack.last().cloned().unwrap_or_default()
+            };
+            if is_empty {
+                let id = TestId::new(&suite_path, &name)?;
+                out.push(TestResult {
+                    id,
+                    suite: suite_path,
+                    name,
+                    status: TestStatus::Passed,
+                    duration: Duration::from_secs_f64(time.max(0.0)),
+                    message: None,
+                    framework,
+                    log_excerpt: None,
+                });
+            } else {
+                *current = Some(TestCaseBuilder {
+                    suite: suite_path,
+                    name,
+                    time,
+                    status: TestStatus::Passed,
+                    message: None,
+                    log: None,
+                });
+                current_text.clear();
+            }
+        }
+        "failure" | "error" | "skipped" => {
+            if let Some(cur) = current.as_mut() {
+                let msg = read_attr(e, b"message").or_else(|| read_attr(e, b"type"));
+                cur.status = match tag {
+                    "failure" => TestStatus::Failed,
+                    "error" => TestStatus::Errored,
+                    "skipped" => TestStatus::Skipped,
+                    _ => cur.status,
+                };
+                if let Some(m) = msg {
+                    cur.message.get_or_insert(m);
+                }
+            }
+        }
+        "system-out" | "system-err" => {
+            current_text.clear();
+        }
+        _ => {}
+    }
+    Ok(())
 }
 
 #[cfg(test)]

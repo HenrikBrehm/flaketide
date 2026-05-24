@@ -1,4 +1,4 @@
-﻿//! `flaketide quarantine` — add/list/remove quarantine entries; emit framework-specific skip annotations.
+//! `flaketide quarantine` — add/list/remove quarantine entries; emit framework-specific skip annotations.
 
 use std::path::Path;
 

@@ -1,4 +1,4 @@
-﻿//! SQLite-backed history store. Async wrapper over `rusqlite` using `spawn_blocking`.
+//! SQLite-backed history store. Async wrapper over `rusqlite` using `spawn_blocking`.
 
 use std::path::Path;
 use std::sync::Arc;

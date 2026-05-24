@@ -1,4 +1,4 @@
-﻿//! Stream-capture helper: read child stdout/stderr to a bounded buffer,
+//! Stream-capture helper: read child stdout/stderr to a bounded buffer,
 //! optionally tee to the parent's stdout/stderr.
 
 use tokio::io::{AsyncRead, AsyncReadExt};

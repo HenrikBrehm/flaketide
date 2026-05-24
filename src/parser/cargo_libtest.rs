@@ -1,4 +1,4 @@
-﻿//! `cargo test --format=json` (libtest) and nextest `libtest-json-plus` parser.
+//! `cargo test --format=json` (libtest) and nextest `libtest-json-plus` parser.
 //!
 //! Event lines:
 //! ```text

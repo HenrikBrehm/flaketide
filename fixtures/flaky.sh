@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -u
 RUN_ID="${FLAKETIDE_RUN_ID:-0}"
 MOD=$((RUN_ID % 3))

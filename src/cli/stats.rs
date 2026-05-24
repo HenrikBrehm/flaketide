@@ -1,4 +1,4 @@
-﻿//! `flaketide stats` — print current flake verdicts.
+//! `flaketide stats` — print current flake verdicts.
 
 use std::path::Path;
 

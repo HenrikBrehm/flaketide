@@ -1,4 +1,4 @@
-﻿//! Output renderers: stdout tables, Markdown, JSON, JUnit XML, GitHub issue sync.
+//! Output renderers: stdout tables, Markdown, JSON, JUnit XML, GitHub issue sync.
 
 use std::path::Path;
 

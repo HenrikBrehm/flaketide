@@ -1,4 +1,4 @@
-﻿CREATE TABLE quarantine (
+CREATE TABLE quarantine (
     test_id                     TEXT PRIMARY KEY,
     framework                   TEXT NOT NULL,
     reason                      TEXT NOT NULL,

@@ -1,4 +1,4 @@
-﻿//! `flaketide history` — show recent runs.
+//! `flaketide history` — show recent runs.
 
 use std::path::Path;
 

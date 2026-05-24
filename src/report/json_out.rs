@@ -1,4 +1,4 @@
-﻿//! JSON pass-through used by integrations. Currently consumers serialize their
+//! JSON pass-through used by integrations. Currently consumers serialize their
 //! own types via serde directly — this module is a thin alias for clarity.
 
 use serde::Serialize;

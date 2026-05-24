@@ -1,4 +1,4 @@
-﻿//! GitHub issue sync via direct REST calls. We touch exactly three endpoints:
+//! GitHub issue sync via direct REST calls. We touch exactly three endpoints:
 //! - GET /search/issues   (find an existing open issue tagged "flaketide")
 //! - POST /repos/{owner}/{repo}/issues
 //! - PATCH /repos/{owner}/{repo}/issues/{number}

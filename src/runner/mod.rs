@@ -1,4 +1,4 @@
-﻿//! Repeat-runner: execute the test command N times, capture output, parse, return TestRuns.
+//! Repeat-runner: execute the test command N times, capture output, parse, return TestRuns.
 //!
 //! Cross-platform subprocess handling. Best-effort tree-kill via tokio's
 //! `kill_on_drop(true)` + explicit `kill().await`. On Windows, child processes

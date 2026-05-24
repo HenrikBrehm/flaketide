@@ -1,4 +1,4 @@
-﻿//! JSON Lines helpers.
+//! JSON Lines helpers.
 
 /// Iterate over lines of a JSON Lines blob, skipping empty lines.
 pub fn jsonl_lines(raw: &[u8]) -> impl Iterator<Item = &[u8]> {

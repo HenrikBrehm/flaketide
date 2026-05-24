@@ -1,4 +1,4 @@
-﻿//! `flaketide init` — write a starter flaketide.toml in the repo root.
+//! `flaketide init` — write a starter flaketide.toml in the repo root.
 
 use std::fs;
 use std::path::Path;

@@ -1,4 +1,4 @@
-﻿//! Pure data types shared across every module. No async, no IO, no DB.
+//! Pure data types shared across every module. No async, no IO, no DB.
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};

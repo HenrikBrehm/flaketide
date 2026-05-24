@@ -1,4 +1,4 @@
-﻿//! Emit a JUnit-compatible XML summary so flaketide regressions can be surfaced
+//! Emit a JUnit-compatible XML summary so flaketide regressions can be surfaced
 //! by any CI consumer that already parses JUnit.
 
 use crate::domain::{FlakeReport, Thresholds};

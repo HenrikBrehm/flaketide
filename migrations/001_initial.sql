@@ -1,4 +1,4 @@
-﻿CREATE TABLE runs (
+CREATE TABLE runs (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     started_at   TEXT NOT NULL,
     finished_at  TEXT NOT NULL,

@@ -1,4 +1,4 @@
-﻿//! Command-line interface — top-level [`Cli`] parser and [`dispatch`] entry point.
+//! Command-line interface — top-level [`Cli`] parser and [`dispatch`] entry point.
 
 use std::path::PathBuf;
 use std::time::Duration;

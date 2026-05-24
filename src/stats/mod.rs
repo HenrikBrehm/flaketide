@@ -1,4 +1,4 @@
-﻿//! Bayesian flake-probability engine.
+//! Bayesian flake-probability engine.
 //!
 //! Beta-Binomial model with uniform prior `Beta(1, 1)`:
 //! after observing `f` failures in `n` runs, the posterior is

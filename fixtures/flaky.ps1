@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 $runId = if ($env:FLAKETIDE_RUN_ID) { [int]$env:FLAKETIDE_RUN_ID } else { 0 }
 $mod = $runId % 3
 Write-Output '{ "type": "suite", "event": "started", "test_count": 2 }'

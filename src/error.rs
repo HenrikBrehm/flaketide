@@ -1,4 +1,4 @@
-﻿//! Crate-wide error type and Result alias.
+//! Crate-wide error type and Result alias.
 
 use std::path::PathBuf;
 use thiserror::Error;

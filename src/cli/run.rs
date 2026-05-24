@@ -1,4 +1,4 @@
-﻿//! `flaketide run` — execute the test command N times, persist, report flakes.
+//! `flaketide run` — execute the test command N times, persist, report flakes.
 
 use std::path::Path;
 use std::time::Duration;

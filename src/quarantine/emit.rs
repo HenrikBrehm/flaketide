@@ -1,4 +1,4 @@
-﻿//! Emit the framework-specific skip annotation for a test.
+//! Emit the framework-specific skip annotation for a test.
 
 use crate::domain::{Framework, TestId};
 

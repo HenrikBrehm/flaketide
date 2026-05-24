@@ -1,4 +1,4 @@
-﻿//! `flaketide tui` — interactive ratatui explorer.
+//! `flaketide tui` — interactive ratatui explorer.
 
 use std::path::Path;
 

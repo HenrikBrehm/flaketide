@@ -1,4 +1,4 @@
-﻿//! Stub for future process-group / Job Object handling.
+//! Stub for future process-group / Job Object handling.
 //!
 //! On Windows, killing a parent process does not kill children. The proper
 //! fix is to assign the child to a Job Object with `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE`.

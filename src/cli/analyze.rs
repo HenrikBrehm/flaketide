@@ -1,4 +1,4 @@
-﻿//! `flaketide analyze` — classify a flaky test's root cause via Claude API.
+//! `flaketide analyze` — classify a flaky test's root cause via Claude API.
 
 use std::path::Path;
 

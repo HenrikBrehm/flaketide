@@ -1,4 +1,4 @@
-﻿//! `go test -json` parser.
+//! `go test -json` parser.
 //!
 //! Stream of events keyed by `Package` + `Test`:
 //! `{"Time":"...","Action":"run","Package":"pkg","Test":"TestName"}`

@@ -1,4 +1,4 @@
-﻿//! pytest --junit-xml parser. Delegates to the generic JUnit XML parser
+//! pytest --junit-xml parser. Delegates to the generic JUnit XML parser
 //! but tags results with `Framework::PytestJunit`.
 
 use crate::domain::{Framework, TestResult};

@@ -1,4 +1,4 @@
-﻿//! Per-framework test-output parsers.
+//! Per-framework test-output parsers.
 //!
 //! Every parser converts framework-specific bytes into a vector of
 //! [`crate::domain::TestResult`]. Auto-detection lives in [`detect`].

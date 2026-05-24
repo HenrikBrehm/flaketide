@@ -1,4 +1,4 @@
-﻿//! Markdown report rendering.
+//! Markdown report rendering.
 
 use crate::domain::{FlakeReport, QuarantineEntry};
 

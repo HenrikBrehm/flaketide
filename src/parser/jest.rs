@@ -1,4 +1,4 @@
-﻿//! Jest / Vitest JSON-reporter parser.
+//! Jest / Vitest JSON-reporter parser.
 //!
 //! Schema (Jest --json):
 //! ```text

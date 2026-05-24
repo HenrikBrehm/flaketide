@@ -1,4 +1,4 @@
-﻿//! Parser for `pytest-json-report` plugin output.
+//! Parser for `pytest-json-report` plugin output.
 //!
 //! Schema:
 //! ```text

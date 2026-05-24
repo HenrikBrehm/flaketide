@@ -1,4 +1,4 @@
-﻿//! `flaketide report` — render summaries or sync a GitHub issue.
+//! `flaketide report` — render summaries or sync a GitHub issue.
 
 use std::path::Path;
 

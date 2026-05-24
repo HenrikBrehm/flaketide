@@ -1,4 +1,4 @@
-﻿// flaketide — Cross-framework flaky-test intelligence CLI
+// flaketide — Cross-framework flaky-test intelligence CLI
 // Copyright (C) 2026  Henrik Brehm
 //
 // This program is free software: you can redistribute it and/or modify

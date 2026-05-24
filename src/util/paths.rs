@@ -1,4 +1,4 @@
-﻿//! Path discovery helpers.
+//! Path discovery helpers.
 
 use std::path::{Path, PathBuf};
 
