@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`flaketide mcp`** — Model Context Protocol server over stdio.
+  Exposes `list_flaky_tests`, `get_test_history`, `get_test_stats`,
+  `get_quarantine_debt`, and `analyze_test` as MCP tools so agentic
+  coding tools (Claude Code, Cursor, Continue, OpenCode) can query
+  flaketide directly from inside an editor.
+- **`flaketide bisect <test_id> -- <cmd>`** — git-bisect for flakes.
+  Walks the commit range in bisection order, runs the test N times
+  per candidate commit, finds the first commit where the Bayesian
+  posterior crosses a configurable threshold.
+- **`flaketide cost`** — dollar-impact report. Multiplies failed-test
+  minutes by a configurable CI runner $/minute rate (default GitHub
+  Actions Linux), prints the monthly burn and top offenders.
+- **`flaketide demo`** — self-contained walkthrough on a synthetic
+  flaky suite (30 runs in under 2 minutes). Useful for screenshots,
+  conference demos, and smoke-testing a fresh install.
+- **`flaketide tag`** — heuristic flake-pattern detection without any
+  LLM. Tags tests as `scheduling` / `ordering` / `flapping` /
+  `worsening` based purely on observed correlations in local history.
+
 ## [0.1.0-rc1] - 2026-05-24
 
 ### Added

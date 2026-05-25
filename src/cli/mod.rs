@@ -9,13 +9,18 @@ use crate::domain::Framework;
 use crate::error::Result;
 
 pub mod analyze;
+pub mod bisect;
 pub mod ci;
+pub mod cost;
+pub mod demo;
 pub mod history;
 pub mod init;
+pub mod mcp;
 pub mod quarantine;
 pub mod report;
 pub mod run;
 pub mod stats;
+pub mod tag;
 pub mod tui;
 
 #[derive(Debug, Parser)]
@@ -65,6 +70,16 @@ pub enum Cmd {
     History(history::HistoryArgs),
     /// Show current flake statistics.
     Stats(stats::StatsArgs),
+    /// Compute the $-impact of flaky tests on your CI bill.
+    Cost(cost::CostArgs),
+    /// Auto-tag flake patterns from history using heuristics (no AI key needed).
+    Tag(tag::TagArgs),
+    /// Bisect git history to find the commit that introduced a flake.
+    Bisect(bisect::BisectArgs),
+    /// Run a self-contained demo against a synthetic flaky test suite.
+    Demo(demo::DemoArgs),
+    /// Speak the Model Context Protocol on stdio so Claude Code / Cursor can query flaketide.
+    Mcp(mcp::McpArgs),
     /// Generate shell completions and print to stdout.
     Completions {
         /// Target shell.
@@ -122,6 +137,11 @@ pub async fn dispatch(cli: Cli) -> Result<i32> {
         Cmd::Report(a) => report::run(a, cli.config.as_deref(), cli.json).await,
         Cmd::History(a) => history::run(a, cli.config.as_deref(), cli.json).await,
         Cmd::Stats(a) => stats::run(a, cli.config.as_deref(), cli.json).await,
+        Cmd::Cost(a) => cost::run(a, cli.config.as_deref(), cli.json).await,
+        Cmd::Tag(a) => tag::run(a, cli.config.as_deref(), cli.json).await,
+        Cmd::Bisect(a) => bisect::run(a, cli.config.as_deref()).await,
+        Cmd::Demo(a) => demo::run(a, cli.config.as_deref()).await,
+        Cmd::Mcp(a) => mcp::run(a, cli.config.as_deref()).await,
         Cmd::Completions { shell } => completions_cmd(shell),
         Cmd::Man { out_dir } => man_cmd(&out_dir),
     }
